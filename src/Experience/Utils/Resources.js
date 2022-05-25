@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import EventEmitter from './EventEmitter.js';
 
 export default class Resources extends EventEmitter {
@@ -17,8 +19,15 @@ export default class Resources extends EventEmitter {
     }
 
     setLoaders() {
+        const dracoLoader = new DRACOLoader();
+        dracoLoader.setDecoderPath('/static/draco/');
+        dracoLoader.setDecoderConfig({ type: 'js' });
+
         this.loaders = {};
         this.loaders.gltfLoader = new GLTFLoader();
+        this.loaders.gltfLoader.setDRACOLoader(dracoLoader);
+
+        this.loaders.fbxLoader = new FBXLoader();
         this.loaders.textureLoader = new THREE.TextureLoader();
         this.loaders.cubeTextureLoader = new THREE.CubeTextureLoader();
     }
@@ -36,6 +45,10 @@ export default class Resources extends EventEmitter {
                 });
             } else if (source.type === 'cubeTexture') {
                 this.loaders.cubeTextureLoader.load(source.path, (file) => {
+                    this.sourceLoaded(source, file);
+                });
+            } else if (source.type === 'fbxModel') {
+                this.loaders.fbxLoader.load(source.path, (file) => {
                     this.sourceLoaded(source, file);
                 });
             }

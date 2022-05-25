@@ -7,13 +7,15 @@ import Camera from './Camera.js';
 import Renderer from './Renderer.js';
 import World from './World/World.js';
 import Resources from './Utils/Resources.js';
+import Events from './Utils/Events.js';
 
 import sources from './sources.js';
+import Elements from './World/Elements.js';
 
 let instance = null;
 
 export default class Experience {
-    constructor(_canvas) {
+    constructor(_canvas, _elements = []) {
         // Singleton
         if (instance) {
             return instance;
@@ -35,6 +37,8 @@ export default class Experience {
         this.camera = new Camera();
         this.renderer = new Renderer();
         this.world = new World();
+        this.events = new Events();
+        this.elements = new Elements(_elements);
 
         // Resize event
         this.sizes.on('resize', () => {
@@ -56,6 +60,7 @@ export default class Experience {
         this.camera.update();
         this.world.update();
         this.renderer.update();
+        this.elements.update();
     }
 
     destroy() {
@@ -84,5 +89,9 @@ export default class Experience {
         this.renderer.instance.dispose();
 
         if (this.debug.active) this.debug.ui.destroy();
+    }
+
+    eventEmit(arg) {
+        console.log('emit event', arg);
     }
 }
